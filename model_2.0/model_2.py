@@ -1,0 +1,146 @@
+#Importando tudo do módulo "model"
+from model_1 import *
+
+#Classes associativas:
+
+#Classe JogoDev
+
+class JogoDev(Tabela):
+    def __init__(self) -> None :
+        super().__init__()
+        conn = sqlite3.connect("meuDB.db")
+        cursor = conn.cursor()
+        cursor.execute(""" 
+        CREATE TABLE IF NOT EXISTS JogoDev(
+            id_game INTEGER,
+            id_developer INTEGER,
+            PRIMARY KEY (id_game, id_developer),
+            FOREIGN KEY (id_game) REFERENCES Jogos(id_jogo) ON DELETE CASCADE,
+            FOREIGN KEY (id_developer) REFERENCES Desenvolvedores(id_dev) ON DELETE CASCADE
+            );
+        """)
+        conn.close()
+        
+    def add_Jogo_Dev(self) -> None:
+        self.conn = self.module.connect("meuDB.db")
+        self.cursor = self.conn.cursor()
+        self.cursor.execute("SELECT id_jogo FROM Jogos;")
+        last_value = self.cursor.fetchall()[-1][0]
+        self.cursor.execute(f"""
+                INSERT INTO JogoDev(id_game, id_developer)
+                VALUES({last_value}, {last_value});
+                """)
+        self.conn.commit()
+        self.conn.close()
+            
+    def select_associacoesJD(self) -> list:
+        self.conn = self.module.connect("meuDB.db")
+        self.cursor = self.conn.cursor()
+        self.cursor.execute("SELECT * FROM JogoDev;")
+        registros = []
+        for registro in self.cursor.fetchall():
+            registros.append({
+                'id_game': registro[0],
+                'id_dev': registro[1]
+            })
+        self.conn.close()
+        return registros
+    
+#Classe JogoPlata
+
+class JogoPlata(Tabela):
+    def __init__(self) -> None:
+        super().__init__()
+        self.cursor.execute(""" 
+        CREATE TABLE IF NOT EXISTS JogoPlata(
+            id_game INTEGER,
+            id_plataforma INTEGER,
+            PRIMARY KEY (id_game, id_plataforma),
+            FOREIGN KEY (id_game) REFERENCES Jogos(id_jogo) ON DELETE CASCADE,
+            FOREIGN KEY (id_plataforma) REFERENCES Plataformas(id_plata) ON DELETE CASCADE
+            );
+        """)
+        self.conn.close()
+        
+    def add_Jogo_Plata(self) -> None:
+        self.conn = self.module.connect("meuDB.db")
+        self.cursor = self.conn.cursor()
+        self.cursor.execute("SELECT id_jogo FROM Jogos;")
+        last_value = self.cursor.fetchall()[-1][0]
+        self.cursor.execute(f"""
+                INSERT INTO JogoPlata(id_game, id_plataforma)
+                VALUES({last_value}, {last_value});
+                """)
+        self.conn.commit()
+        self.conn.close()
+            
+    def select_associacoesJP(self) -> list:
+        self.conn = self.module.connect("meuDB.db")
+        self.cursor = self.conn.cursor()
+        self.cursor.execute("SELECT * FROM JogoPlata;")
+        registros = []
+        for registro in self.cursor.fetchall():
+            registros.append({
+                'id_game': registro[0],
+                'id_plataforma': registro[1]
+            })
+        self.conn.close()
+        return registros
+    
+#Classe JogoGen
+
+class JogoGen(Tabela):
+    def __init__(self) -> None:
+        super().__init__()
+        self.cursor.execute(""" 
+        CREATE TABLE IF NOT EXISTS JogoGen(
+            id_game INTEGER,
+            id_genero INTEGER,
+            PRIMARY KEY (id_game, id_genero),
+            FOREIGN KEY (id_game) REFERENCES Jogos(id_jogo) ON DELETE CASCADE,
+            FOREIGN KEY (id_genero) REFERENCES Generos(id_gen) ON DELETE CASCADE
+            );
+        """)
+        self.conn.close()
+    
+    def add_Jogo_Gen(self) -> None:
+        self.conn = self.module.connect("meuDB.db")
+        self.cursor = self.conn.cursor()
+        self.cursor.execute("SELECT id_jogo FROM Jogos;")
+        last_value = self.cursor.fetchall()[-1][0]
+        self.cursor.execute(f"""
+                INSERT INTO JogoGen(id_game, id_genero)
+                VALUES({last_value}, {last_value});
+                """)
+        self.conn.commit()
+        self.conn.close()
+    
+    def select_associacoesJGEN(self) -> list:
+        self.conn = self.module.connect("meuDB.db")
+        self.cursor = self.conn.cursor()
+        self.cursor.execute("SELECT * FROM JogoGen;")
+        registros = []
+        for registro in self.cursor.fetchall():
+            registros.append({
+                'id_game': registro[0],
+                'id_genero': registro[1]
+            })
+        self.conn.close()
+        return registros
+
+
+#Objetos de cada tabela:
+
+Obj_JDEV = JogoDev()
+Obj_JPLATA = JogoPlata()
+Obj_JGEN = JogoGen()
+
+#Inserindo dados (relações) em cada associação:
+Obj_JDEV.add_Jogo_Dev()
+Obj_JPLATA.add_Jogo_Plata()
+Obj_JGEN.add_Jogo_Gen()
+
+#Selecionando os dados de cada associação:
+print(Obj_JDEV.select_associacoesJD())
+print(Obj_JPLATA.select_associacoesJP())
+print(Obj_JGEN.select_associacoesJGEN())
